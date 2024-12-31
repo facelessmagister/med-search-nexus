@@ -1,7 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Pagination } from "@/components/ui/pagination";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Download } from "lucide-react";
+import { downloadCitation } from "@/utils/citationUtils";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 interface SearchResult {
   id: string;
@@ -21,6 +24,7 @@ interface SearchResultsProps {
   error: Error | null;
   currentPage: number;
   onPageChange: (page: number) => void;
+  totalPages?: number;
 }
 
 export const SearchResults = ({
@@ -29,6 +33,7 @@ export const SearchResults = ({
   error,
   currentPage,
   onPageChange,
+  totalPages = 5,
 }: SearchResultsProps) => {
   if (error) {
     return (
@@ -58,6 +63,10 @@ export const SearchResults = ({
     return `${result.authors.join(", ")}. ${result.title}. ${result.journal}. ${result.year};${result.volume}(${result.issue}):${result.pages}. doi:${result.doi}`;
   };
 
+  const handleDownload = (result: SearchResult, format: 'ris' | 'bibtex') => {
+    downloadCitation(result, format);
+  };
+
   return (
     <div className="space-y-6">
       {results.length === 0 ? (
@@ -74,20 +83,52 @@ export const SearchResults = ({
                   <p className="text-sm text-muted-foreground mb-2">
                     {formatCitation(result)}
                   </p>
-                  <button
-                    className="text-sm text-primary flex items-center gap-1 hover:underline"
-                    onClick={() => {/* TODO: Implement citation download */}}
-                  >
-                    <Download className="h-4 w-4" />
-                    Download Citation
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="text-primary flex items-center gap-1">
+                        <Download className="h-4 w-4" />
+                        Download Citation
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => handleDownload(result, 'ris')}>
+                        Download RIS
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDownload(result, 'bibtex')}>
+                        Download BibTeX
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </CardContent>
               </Card>
             ))}
           </div>
           <div className="flex justify-center mt-6">
             <Pagination>
-              {/* TODO: Implement pagination controls */}
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                  />
+                </PaginationItem>
+                {[...Array(totalPages)].map((_, i) => (
+                  <PaginationItem key={i + 1}>
+                    <PaginationLink
+                      onClick={() => onPageChange(i + 1)}
+                      isActive={currentPage === i + 1}
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+                  />
+                </PaginationItem>
+              </PaginationContent>
             </Pagination>
           </div>
         </>

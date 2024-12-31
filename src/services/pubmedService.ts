@@ -14,13 +14,34 @@ export interface PubMedResult {
   doi: string;
 }
 
-export const searchPubMed = async (query: string): Promise<PubMedResult[]> => {
+interface SearchFilters {
+  databases: string[];
+  yearFrom: string;
+  yearTo: string;
+}
+
+export const searchPubMed = async (
+  query: string,
+  filters?: SearchFilters
+): Promise<PubMedResult[]> => {
   try {
-    // First, search for IDs
+    let searchTerm = query;
+
+    // Add year range to query if provided
+    if (filters?.yearFrom && filters?.yearTo) {
+      searchTerm += ` AND ("${filters.yearFrom}"[PDAT] : "${filters.yearTo}"[PDAT])`;
+    }
+
+    // Handle boolean operators
+    searchTerm = searchTerm
+      .replace(/\bAND\b/g, ' AND ')
+      .replace(/\bOR\b/g, ' OR ')
+      .replace(/\bNOT\b/g, ' NOT ');
+
     const searchResponse = await axios.get(`${PUBMED_BASE_URL}/esearch.fcgi`, {
       params: {
         db: 'pubmed',
-        term: query,
+        term: searchTerm,
         retmode: 'json',
         retmax: 10,
       },
@@ -30,7 +51,6 @@ export const searchPubMed = async (query: string): Promise<PubMedResult[]> => {
 
     if (!ids.length) return [];
 
-    // Then fetch details for those IDs
     const summaryResponse = await axios.get(`${PUBMED_BASE_URL}/esummary.fcgi`, {
       params: {
         db: 'pubmed',

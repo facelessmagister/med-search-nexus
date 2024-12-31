@@ -4,7 +4,13 @@ import { useToast } from "@/components/ui/use-toast";
 
 interface SearchResult extends PubMedResult {}
 
-export const useSearch = (query: string) => {
+interface SearchFilters {
+  databases: string[];
+  yearFrom: string;
+  yearTo: string;
+}
+
+export const useSearch = (query: string, filters?: SearchFilters) => {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -22,7 +28,7 @@ export const useSearch = (query: string) => {
       setError(null);
 
       try {
-        const pubmedResults = await searchPubMed(query);
+        const pubmedResults = await searchPubMed(query, filters);
         setResults(pubmedResults);
       } catch (err) {
         const error = err instanceof Error ? err : new Error("An error occurred");
@@ -38,7 +44,7 @@ export const useSearch = (query: string) => {
     };
 
     fetchResults();
-  }, [query, currentPage, toast]);
+  }, [query, filters, currentPage, toast]);
 
   return { results, isLoading, error, currentPage, setCurrentPage };
 };
