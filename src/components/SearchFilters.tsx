@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -46,46 +46,44 @@ export const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Filters</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <Card className="backdrop-blur-lg bg-background/50 border-primary/20">
+      <CardContent className="space-y-6 p-6">
         <div className="space-y-4">
-          <h4 className="font-medium">Databases</h4>
-          <div className="space-y-2">
+          <h4 className="font-medium text-primary">Databases</h4>
+          <div className="grid grid-cols-2 gap-4">
             {["PubMed Central", "TCIA", "Dryad", "MDM"].map((db) => (
               <div key={db} className="flex items-center space-x-2">
                 <Checkbox 
                   id={db} 
                   onCheckedChange={(checked) => handleDatabaseChange(db, checked as boolean)}
+                  className="border-primary/50"
                 />
-                <Label htmlFor={db}>{db}</Label>
+                <Label htmlFor={db} className="text-sm">{db}</Label>
               </div>
             ))}
           </div>
         </div>
 
         <div className="space-y-4">
-          <h4 className="font-medium">Year Range</h4>
-          <div className="grid grid-cols-2 gap-2">
+          <h4 className="font-medium text-primary">Year Range</h4>
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="yearFrom">From</Label>
+              <Label htmlFor="yearFrom" className="text-sm">From</Label>
               <Input
                 type="number"
                 id="yearFrom"
-                className="w-full mt-1"
+                className="mt-1 bg-background/50 border-primary/20"
                 min="1900"
                 max={new Date().getFullYear()}
                 onChange={handleYearChange}
               />
             </div>
             <div>
-              <Label htmlFor="yearTo">To</Label>
+              <Label htmlFor="yearTo" className="text-sm">To</Label>
               <Input
                 type="number"
                 id="yearTo"
-                className="w-full mt-1"
+                className="mt-1 bg-background/50 border-primary/20"
                 min="1900"
                 max={new Date().getFullYear()}
                 onChange={handleYearChange}
