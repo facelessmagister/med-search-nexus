@@ -12,6 +12,7 @@ export interface PubMedResult {
   issue: string;
   pages: string;
   doi: string;
+  url?: string;
 }
 
 interface SearchFilters {
@@ -25,7 +26,8 @@ export const searchPubMed = async (
   filters?: SearchFilters
 ): Promise<PubMedResult[]> => {
   try {
-    let searchTerm = query;
+    let searchTerm = query.trim();
+    if (!searchTerm) return [];
 
     // Add year range to query if provided
     if (filters?.yearFrom && filters?.yearTo) {
@@ -47,9 +49,11 @@ export const searchPubMed = async (
       },
     });
 
-    const ids = searchResponse.data.esearchresult.idlist;
+    if (!searchResponse.data?.esearchresult?.idlist?.length) {
+      return [];
+    }
 
-    if (!ids.length) return [];
+    const ids = searchResponse.data.esearchresult.idlist;
 
     const summaryResponse = await axios.get(`${PUBMED_BASE_URL}/esummary.fcgi`, {
       params: {
@@ -59,23 +63,28 @@ export const searchPubMed = async (
       },
     });
 
-    const results = Object.values(summaryResponse.data.result).filter(
+    const results = Object.values(summaryResponse.data.result || {}).filter(
       (item: any) => item.uid !== undefined
     );
 
     return results.map((item: any) => ({
       id: item.uid,
-      title: item.title,
+      title: item.title || 'Untitled',
       authors: item.authors?.map((author: any) => author.name) || [],
-      journal: item.fulljournalname || item.source,
+      journal: item.fulljournalname || item.source || '',
       year: item.pubdate?.split(' ')[0] || '',
       volume: item.volume || '',
       issue: item.issue || '',
       pages: item.pages || '',
       doi: item.elocationid?.replace('doi: ', '') || '',
+      url: item.doi ? `https://doi.org/${item.doi}` : 
+           `https://pubmed.ncbi.nlm.nih.gov/${item.uid}/`,
     }));
   } catch (error) {
     console.error('Error fetching from PubMed:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(`Failed to fetch results from PubMed: ${error.message}`);
+    }
     throw new Error('Failed to fetch results from PubMed');
   }
 };
