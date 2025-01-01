@@ -45,13 +45,22 @@ export const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
     });
   };
 
+  const databases = [
+    "PubMed Central",
+    "ClinicalTrials.gov",
+    "OpenFDA",
+    "TCIA",
+    "Dryad",
+    "MDM"
+  ];
+
   return (
     <Card className="backdrop-blur-lg bg-background/50 border-primary/20">
       <CardContent className="space-y-6 p-6">
         <div className="space-y-4">
           <h4 className="font-medium text-primary">Databases</h4>
           <div className="grid grid-cols-2 gap-4">
-            {["PubMed Central", "TCIA", "Dryad", "MDM"].map((db) => (
+            {databases.map((db) => (
               <div key={db} className="flex items-center space-x-2">
                 <Checkbox 
                   id={db} 

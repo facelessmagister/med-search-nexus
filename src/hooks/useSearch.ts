@@ -1,14 +1,7 @@
 import { useState, useEffect } from "react";
-import { searchPubMed, PubMedResult } from "../services/pubmedService";
+import { searchAllDatabases } from "../services/searchService";
+import { SearchResult, SearchFilters } from "../services/types";
 import { useToast } from "@/components/ui/use-toast";
-
-interface SearchResult extends PubMedResult {}
-
-interface SearchFilters {
-  databases: string[];
-  yearFrom: string;
-  yearTo: string;
-}
 
 export const useSearch = (query: string, filters?: SearchFilters) => {
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -28,8 +21,8 @@ export const useSearch = (query: string, filters?: SearchFilters) => {
       setError(null);
 
       try {
-        const pubmedResults = await searchPubMed(query, filters);
-        setResults(pubmedResults);
+        const searchResults = await searchAllDatabases(query, filters || { databases: [], yearFrom: '', yearTo: '' });
+        setResults(searchResults);
       } catch (err) {
         const error = err instanceof Error ? err : new Error("An error occurred");
         setError(error);
