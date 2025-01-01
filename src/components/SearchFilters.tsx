@@ -49,6 +49,11 @@ export const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
     "PubMed Central",
     "ClinicalTrials.gov",
     "OpenFDA",
+    "DailyMed",
+    "RxNorm",
+    "Clinical Table Search",
+    "CORD-19",
+    "MIMIC-IV",
     "TCIA",
     "Dryad",
     "MDM"
