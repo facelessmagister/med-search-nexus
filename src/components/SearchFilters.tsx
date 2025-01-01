@@ -46,17 +46,9 @@ export const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
   };
 
   const databases = [
-    "PubMed Central",
-    "ClinicalTrials.gov",
-    "OpenFDA",
-    "DailyMed",
-    "RxNorm",
-    "Clinical Table Search",
-    "CORD-19",
-    "MIMIC-IV",
-    "TCIA",
-    "Dryad",
-    "MDM"
+    "PubMed",
+    "Pillbox",
+    "Reactome"
   ];
 
   return (
