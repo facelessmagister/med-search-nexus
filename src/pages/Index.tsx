@@ -6,6 +6,7 @@ import { useSearch } from "@/hooks/useSearch";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SortOption } from "@/utils/searchRanking";
 
 interface SearchFilters {
   databases: string[];
@@ -22,7 +23,15 @@ const Index = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
   
-  const { results, isLoading, error, currentPage, setCurrentPage } = useSearch(query, filters);
+  const { 
+    results, 
+    isLoading, 
+    error, 
+    currentPage, 
+    setCurrentPage,
+    sortBy,
+    setSortBy 
+  } = useSearch(query, filters);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-primary/5">
@@ -63,6 +72,8 @@ const Index = () => {
               error={error}
               currentPage={currentPage}
               onPageChange={setCurrentPage}
+              onSortChange={setSortBy}
+              sortBy={sortBy}
             />
           </div>
         </div>

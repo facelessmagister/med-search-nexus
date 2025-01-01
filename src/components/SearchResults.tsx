@@ -6,6 +6,8 @@ import { downloadCitation } from "@/utils/citationUtils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SortOption } from "@/utils/searchRanking";
 
 interface SearchResult {
   id: string;
@@ -18,6 +20,8 @@ interface SearchResult {
   pages: string;
   doi: string;
   url?: string;
+  abstract?: string;
+  citationCount?: number;
 }
 
 interface SearchResultsProps {
@@ -27,6 +31,8 @@ interface SearchResultsProps {
   currentPage: number;
   onPageChange: (page: number) => void;
   totalPages?: number;
+  onSortChange: (sortBy: SortOption) => void;
+  sortBy: SortOption;
 }
 
 export const SearchResults = ({
@@ -36,6 +42,8 @@ export const SearchResults = ({
   currentPage,
   onPageChange,
   totalPages = 5,
+  onSortChange,
+  sortBy,
 }: SearchResultsProps) => {
   if (error) {
     return (
@@ -83,14 +91,38 @@ export const SearchResults = ({
         </div>
       ) : (
         <>
+          <div className="flex justify-end mb-4">
+            <Select value={sortBy} onValueChange={(value) => onSortChange(value as SortOption)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="relevance">Relevance</SelectItem>
+                <SelectItem value="year">Publication Year</SelectItem>
+                <SelectItem value="citations">Citation Count</SelectItem>
+                <SelectItem value="journal">Journal</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="space-y-4">
             {results.map((result) => (
               <Card key={result.id} className="backdrop-blur-lg bg-background/50 border-primary/20 hover:bg-background/70 transition-all duration-300">
                 <CardContent className="p-4">
                   <h3 className="font-semibold mb-2 text-primary">{result.title}</h3>
+                  {result.citationCount !== undefined && (
+                    <span className="text-sm text-muted-foreground mb-2 block">
+                      Citations: {result.citationCount}
+                    </span>
+                  )}
                   <p className="text-sm text-muted-foreground mb-2">
                     {formatCitation(result)}
                   </p>
+                  {result.abstract && (
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                      {result.abstract}
+                    </p>
+                  )}
                   <div className="flex gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -122,6 +154,7 @@ export const SearchResults = ({
               </Card>
             ))}
           </div>
+
           <div className="flex justify-center mt-6">
             <Pagination>
               <PaginationContent>
