@@ -9,6 +9,8 @@ export interface SearchResult {
   pages: string;
   doi: string;
   url?: string;
+  abstract?: string;
+  citationCount?: number;
 }
 
 export interface SearchFilters {
