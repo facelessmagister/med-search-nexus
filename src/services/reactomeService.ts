@@ -2,7 +2,9 @@ import { SearchResult } from './types';
 
 export const searchReactome = async (query: string): Promise<SearchResult[]> => {
   try {
-    const response = await fetch(`https://reactome.org/ContentService/search/query?query=${encodeURIComponent(query)}&cluster=true`);
+    const response = await fetch(
+      `https://reactome.org/ContentService/search/query?query=${encodeURIComponent(query)}&cluster=true`
+    );
     const data = await response.json();
     
     return data.results.map((item: any) => ({

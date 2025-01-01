@@ -9,7 +9,7 @@ export const searchDailyMed = async (query: string): Promise<SearchResult[]> => 
     
     return data.data.map((item: any) => ({
       id: item.setid,
-      title: item.drug_name,
+      title: item.drug_name || 'Unknown Drug',
       authors: [],
       journal: 'DailyMed',
       year: new Date(item.published_date).getFullYear().toString(),

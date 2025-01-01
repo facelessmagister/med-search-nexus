@@ -47,7 +47,11 @@ export const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
 
   const databases = [
     "PubMed",
-    "Pillbox",
+    "ClinicalTrials.gov",
+    "DailyMed",
+    "RxNorm",
+    "Clinical Table Search",
+    "OpenFDA",
     "Reactome"
   ];
 

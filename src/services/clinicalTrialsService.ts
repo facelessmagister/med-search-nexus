@@ -1,38 +1,28 @@
-import axios from 'axios';
 import { SearchResult } from './types';
-
-const CLINICAL_TRIALS_BASE_URL = "https://clinicaltrials.gov/api/query/study_fields";
 
 export const searchClinicalTrials = async (query: string): Promise<SearchResult[]> => {
   try {
-    const response = await axios.get(CLINICAL_TRIALS_BASE_URL, {
-      params: {
-        expr: query,
-        fields: "NCTId,BriefTitle,Condition,LocationCountry,InterventionName,Phase",
-        max_rnk: 10,
-        fmt: "json",
-      },
-    });
-
-    const studies = response.data?.StudyFieldsResponse?.StudyFields || [];
-
+    const response = await fetch(
+      `https://clinicaltrials.gov/api/query/study_fields?expr=${encodeURIComponent(query)}&fields=NCTId,BriefTitle,Condition,BriefSummary&max_rnk=10&fmt=json`
+    );
+    const data = await response.json();
+    
+    const studies = data?.StudyFieldsResponse?.StudyFields || [];
     return studies.map((study: any) => ({
-      id: study.NCTId?.[0] || '',
-      title: study.BriefTitle?.[0] || 'Untitled Trial',
-      authors: [], // Clinical trials don't have authors in the same way
+      id: study.NCTId?.[0] || Math.random().toString(),
+      title: study.BriefTitle?.[0] || 'Untitled Study',
+      authors: [],
       journal: 'ClinicalTrials.gov',
-      year: new Date().getFullYear().toString(), // Using current year as trials are ongoing
-      volume: study.Phase?.[0] || 'N/A',
-      issue: 'N/A',
-      pages: 'N/A',
+      year: new Date().getFullYear().toString(),
+      volume: '',
+      issue: '',
+      pages: '',
       doi: '',
       url: `https://clinicaltrials.gov/study/${study.NCTId?.[0]}`,
+      abstract: study.BriefSummary?.[0] || '',
     }));
   } catch (error) {
-    console.error('Error fetching from ClinicalTrials.gov:', error);
-    if (axios.isAxiosError(error)) {
-      throw new Error(`Failed to fetch results from ClinicalTrials.gov: ${error.message}`);
-    }
-    throw new Error('Failed to fetch results from ClinicalTrials.gov');
+    console.error('Error searching ClinicalTrials.gov:', error);
+    return [];
   }
 };
